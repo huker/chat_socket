@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/bootstrap.css">
+</head>
+<body>
+<div class="container" style="padding-top: 20px">
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <div class="panel panel-success">
+                <div class="panel panel-heading">欢迎来到聊天室</div>
+                <div class="panel-body">
+                    <ul class="list-group" id="msgContent">
+                    </ul>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-11">
+                            <input type="text" class="form-control" id="txtMsg">
+                        </div>
+                        <div class="col-md-1">
+                            <button class="btn btn-default" type="button" id="sendBtn">发言</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+</div>
+</body>
+<script src="/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    window.onload = function () {
+//        var socket  = io.connect('ws://localhost:8004');
+        var socket  = io.connect('/');
+        function addMsg(msg) {
+            $('#msgContent').append('<li class="list-group-item">'+msg.user+':'+msg.content+'</li>')
+        }
+        socket.on('connect',function () {
+            addMsg({user:'系统',content:'服务器连接成功'});
+        });
+        socket.on('message',function (data) {
+            addMsg(data);
+        });
+        $('#txtMsg').keypress(function (ev) {
+            var char = ev.charCode || ev.keyCode || ev.which;
+            if(char == 13){
+                $('#sendBtn').click();
+            }
+        });
+        $('#sendBtn').click(function () {
+            var msg = $('#txtMsg').val();
+            socket.send(msg);
+            $('#txtMsg').val('');
+        })
+    }
+</script>
+</html>
